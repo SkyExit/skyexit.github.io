@@ -28,6 +28,7 @@ const COUNTRIES = {
     "capital": "Berlin",
     "continent": "Europa",
     "flag": "🇩🇪",
+    "flag_image": "flags/DE.svg",
     "additional_info": "<p><strong>Tempolimit:</strong> Auf der Autobahn teilweise unbegrenzt (Richtgeschwindigkeit 130 km/h), innerorts 50 km/h, außerorts 100 km/h.</p><p><strong>Notruf:</strong> 112 (Feuerwehr/Rettungsdienst), 110 (Polizei)</p><p><strong>Maut:</strong> Keine PKW-Maut auf Autobahnen.</p><p><strong>Promillegrenze:</strong> 0,5 ‰ (Fahranfänger: 0,0 ‰)</p>"
   },
   "FR": {
@@ -137,6 +138,7 @@ const COUNTRIES = {
     "driving": "right",
     "capital": "Prag",
     "continent": "Europa",
+    "flag_image": "flags/CZ.svg",
     "flag": "🇨🇿"
   },
   "SK": {

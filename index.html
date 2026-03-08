@@ -803,14 +803,41 @@
   };
 
   // ── Zoom & Pan ──
+  // ── Frame-Synchronisation für flüssiges Rendering ──
+  let frameRequested = false;
+
   function updateTransform() {
-    // Nutze CSS-Transforms (style.transform) für GPU-Beschleunigung
+    // 1. Zoom niemals unter 100% (Faktor 1) fallen lassen, sonst sieht man den Rand
+    if (currentZoom < 1) currentZoom = 1;
+
+    // 2. Erlaubten Verschiebungs-Bereich berechnen
+    // Die interne SVG-Karte ist 2000x1000 Einheiten groß.
+    const minX = 2000 * (1 - currentZoom);
+    const minY = 1000 * (1 - currentZoom);
+
+    // 3. Pan-Koordinaten zwingend innerhalb der Grenzen einklemmen (Clamping)
+    if (panX > 0) panX = 0;
+    if (panX < minX) panX = minX;
+    
+    if (panY > 0) panY = 0;
+    if (panY < minY) panY = minY;
+
+    // GPU-beschleunigte CSS-Transforms anwenden
     countriesGroup.style.transform = `translate(${panX}px, ${panY}px) scale(${currentZoom})`;
     document.getElementById('graticule').style.transform = `translate(${panX}px, ${panY}px) scale(${currentZoom})`;
+    frameRequested = false;
+  }
+
+  function requestTransform() {
+    // Rendert nur, wenn nicht ohnehin schon ein Frame in der Warteschlange ist
+    if (!frameRequested) {
+      window.requestAnimationFrame(updateTransform);
+      frameRequested = true;
+    }
   }
 
   window.zoomMap = function(factor) {
-    const newZoom = Math.max(0.5, Math.min(10, currentZoom * factor));
+    const newZoom = Math.max(1, Math.min(10, currentZoom * factor));
     // Zoom towards center
     const cx = 1000, cy = 500;
     panX = cx - (cx - panX) * (newZoom / currentZoom);
@@ -827,13 +854,28 @@
   };
 
   // Mouse wheel zoom
+  let zoomTimeout;
+
+  // Mouse wheel zoom
   mapContainer.addEventListener('wheel', (e) => {
     e.preventDefault();
+
+    // 1. Hover-Effekte beim Scrollen deaktivieren
+    mapContainer.classList.add('is-dragging');
+
+    // 2. Timer zurücksetzen, solange das Rad gedreht wird
+    clearTimeout(zoomTimeout);
+
+    // 3. Wenn 150ms lang nicht mehr gescrollt wurde, Hover wieder aktivieren
+    zoomTimeout = setTimeout(() => {
+      mapContainer.classList.remove('is-dragging');
+    }, 150);
+
     const factor = e.deltaY < 0 ? 1.12 : 0.89;
     const rect = svg.getBoundingClientRect();
     const svgX = (e.clientX - rect.left) / rect.width * 2000;
     const svgY = (e.clientY - rect.top) / rect.height * 1000;
-    const newZoom = Math.max(0.5, Math.min(10, currentZoom * factor));
+    const newZoom = Math.max(1.0, Math.min(10, currentZoom * factor));
     panX = svgX - (svgX - panX) * (newZoom / currentZoom);
     panY = svgY - (svgY - panY) * (newZoom / currentZoom);
     currentZoom = newZoom;
@@ -900,14 +942,19 @@
       panX = panStartX + dx;
       panY = panStartY + dy;
       updateTransform();
+      
     } else if (e.touches.length === 2) {
+      
+      // NEU: Hover auch beim Pinch-to-Zoom deaktivieren
+      mapContainer.classList.add('is-dragging');
+      
       const dist = Math.hypot(
         e.touches[0].clientX - e.touches[1].clientX,
         e.touches[0].clientY - e.touches[1].clientY
       );
       if (lastTouchDist > 0) {
         const factor = dist / lastTouchDist;
-        currentZoom = Math.max(0.5, Math.min(10, currentZoom * factor));
+        currentZoom = Math.max(1.0, Math.min(10, currentZoom * factor));
         updateTransform();
       }
       lastTouchDist = dist;

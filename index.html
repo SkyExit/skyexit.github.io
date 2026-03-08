@@ -363,6 +363,23 @@
     gap: 12px;
     margin-top: 16px;
   }
+
+  /* Spezifisches Layout für das Kennzeichen (volle Breite) */
+  .panel-plate-wrap {
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    background: var(--bg-deep);
+    margin-top: 12px;
+  }
+  .panel-plate-wrap img {
+    width: 100%;
+    height: auto;
+    max-height: 120px; /* Verhindert, dass hohe Kennzeichen den halben Bildschirm füllen */
+    object-fit: contain; /* Zeigt das Bild komplett ohne Beschnitt */
+    display: block;
+  }
+
   .panel-img-wrap {
     border-radius: 10px;
     overflow: hidden;
@@ -729,7 +746,7 @@
     // License plate image
     if (info.plate_image) {
       html += '<div class="panel-section-title">Kennzeichen</div>';
-      html += `<div class="panel-images"><div class="panel-img-wrap"><img src="${info.plate_image}" alt="Kennzeichen ${info.name}"><div class="panel-img-caption">Kennzeichen — ${info.name}</div></div></div>`;
+      html += `<div class="panel-plate-wrap"><img src="${info.plate_image}" alt="Kennzeichen ${info.name}"><div class="panel-img-caption">Kennzeichen — ${info.name}</div></div>`;
     }
 
     // Road sign image

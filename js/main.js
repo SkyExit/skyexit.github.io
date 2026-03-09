@@ -61,13 +61,74 @@
 
   // ── Coverage Labels ──
   const coveredCountries = [
+    // Ursprüngliche Liste
     "AL", "AD", "AR", "AU", "AT", "BD", "BE", "BT", "BO", "BW", "BR", "BG", "KH", "CA", "CL", 
     "CO", "CR", "HR", "CZ", "DK", "DO", "EC", "EE", "SZ", "FI", "FR", "DE", "GH", "GR", "GT", 
     "HU", "IS", "IN", "ID", "IE", "IL", "IT", "JP", "JO", "KE", "KG", "LA", "LV", "LS", "LT", 
     "LU", "MK", "MG", "MY", "MT", "MX", "MN", "ME", "NL", "NZ", "NG", "NO", "PA", "PE", "PH", 
     "PL", "PT", "PR", "RO", "RW", "SN", "RS", "SG", "SK", "SI", "ZA", "KR", "ES", "LK", "SE", 
-    "CH", "TW", "TH", "TR", "UG", "UA", "AE", "GB", "US", "UY"
+    "CH", "TW", "TH", "TR", "UG", "UA", "AE", "GB", "US", "UY",
+    // Neue (vorher fehlende) Länder:
+    "BA", "XK", "MD", "VN", "RU", "KZ", "NP", "OM", "QA", "PS", "PY"
   ];
+
+  // Algorithmus zur Findung des Festland-Zentrums
+  function getCountryCenter(path, iso) {
+    // 1. Manuelle Offsets: Falls ein Land (wie Kroatien) zu stark gebogen ist 
+    // und der Schwerpunkt nicht gut aussieht, kannst du es hier per Hand korrigieren (in SVG-Koordinaten).
+    const offsets = {
+      "HR": { dx: -6, dy: 8 },  // Kroatien etwas nach links unten (wg. der Bumerang-Form)
+      "VN": { dx: 3, dy: 0 },   // Vietnam etwas nach rechts
+      "CL": { dx: 8, dy: 0 },   // Chile etwas nach rechts
+      "US": { dx: 15, dy: 15 }, // USA etwas korrigieren
+      "RU": { dx: -30, dy: 0 }  // Russland (um den asiatischen und europäischen Teil auszubalancieren)
+    };
+
+    const d = path.getAttribute('d');
+    // Teilt den SVG-Pfad an jedem 'M' oder 'm' in einzelne Polygone (Inseln) auf
+    const subpaths = d.match(/[Mm][^Mm]+/g);
+
+    let centerX, centerY;
+
+    if (!subpaths || subpaths.length === 1) {
+      // Keine Inseln -> normaler Mittelpunkt
+      const bbox = path.getBBox();
+      centerX = bbox.x + bbox.width / 2;
+      centerY = bbox.y + bbox.height / 2;
+    } else {
+      // Inseln vorhanden -> Finde das Polygon mit der größten Fläche (Festland)
+      let maxArea = 0;
+      let bestBBox = null;
+
+      // Wir erstellen einen unsichtbaren Dummy-Pfad, um den Browser Bounding-Boxes berechnen zu lassen
+      const tempPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      countriesGroup.appendChild(tempPath); 
+
+      subpaths.forEach(subD => {
+        tempPath.setAttribute('d', subD);
+        const bbox = tempPath.getBBox();
+        const area = bbox.width * bbox.height;
+        if (area > maxArea) {
+          maxArea = area;
+          bestBBox = bbox;
+        }
+      });
+
+      countriesGroup.removeChild(tempPath); // Dummy wieder aufräumen
+      
+      // Mittelpunkt des Festlandes setzen
+      centerX = bestBBox.x + bestBBox.width / 2;
+      centerY = bestBBox.y + bestBBox.height / 2;
+    }
+
+    // Offset anwenden, falls konfiguriert
+    if (offsets[iso]) {
+      centerX += offsets[iso].dx;
+      centerY += offsets[iso].dy;
+    }
+
+    return { x: centerX, y: centerY };
+  }
 
   function buildCoverageLabels() {
     const labelsGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
@@ -78,18 +139,20 @@
       const path = document.getElementById(iso.toLowerCase()) || document.getElementById(iso.toUpperCase());
       if (path) {
         path.classList.add('has-coverage');
-        const bbox = path.getBBox();
-        const centerX = bbox.x + bbox.width / 2;
-        const centerY = bbox.y + bbox.height / 2;
+        
+        const isoUpper = iso.toUpperCase();
+        
+        // Neues, intelligentes Zentrum berechnen
+        const center = getCountryCenter(path, isoUpper);
 
         const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        text.setAttribute('x', centerX);
-        text.setAttribute('y', centerY);
+        text.setAttribute('x', center.x);
+        text.setAttribute('y', center.y);
         text.setAttribute('class', 'country-label');
-        text.dataset.iso = iso.toUpperCase();
+        text.dataset.iso = isoUpper;
         
-        const info = (typeof COUNTRIES !== 'undefined') ? COUNTRIES[iso.toUpperCase()] || COUNTRIES[iso.toLowerCase()] : null;
-        text.dataset.name = info ? (info.name || iso) : iso;
+        const info = (typeof COUNTRIES !== 'undefined') ? COUNTRIES[isoUpper] || COUNTRIES[iso.toLowerCase()] : null;
+        text.dataset.name = info ? (info.name || isoUpper) : isoUpper;
 
         text.textContent = text.dataset.iso;
         labelsGroup.appendChild(text);

@@ -523,6 +523,26 @@
     stroke: rgba(255,255,255,0.03);
     stroke-width: 0.3;
   }
+
+/* ── Coverage & Labels ── */
+  .country.has-coverage {
+    fill: #2c443b; /* Ein dezentes, dunkles Grün, das in dein Theme passt */
+  }
+  .country.has-coverage:hover {
+    fill: #3a5a4e;
+    stroke: var(--accent);
+  }
+  
+  .country-label {
+    fill: var(--text);
+    font-family: 'Instrument Sans', sans-serif;
+    font-weight: 700;
+    pointer-events: none; /* Verhindert, dass der Text Klicks auf das Land blockiert */
+    text-anchor: middle;
+    dominant-baseline: central;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.9);
+    transition: opacity 0.2s ease;
+  }
 </style>
 </head>
 <body>
@@ -806,25 +826,24 @@
   // ── Frame-Synchronisation für flüssiges Rendering ──
   let frameRequested = false;
 
-  function updateTransform() {
-    // 1. Zoom niemals unter 100% (Faktor 1) fallen lassen, sonst sieht man den Rand
+function updateTransform() {
     if (currentZoom < 1) currentZoom = 1;
 
-    // 2. Erlaubten Verschiebungs-Bereich berechnen
-    // Die interne SVG-Karte ist 2000x1000 Einheiten groß.
     const minX = 2000 * (1 - currentZoom);
     const minY = 1000 * (1 - currentZoom);
 
-    // 3. Pan-Koordinaten zwingend innerhalb der Grenzen einklemmen (Clamping)
     if (panX > 0) panX = 0;
     if (panX < minX) panX = minX;
     
     if (panY > 0) panY = 0;
     if (panY < minY) panY = minY;
 
-    // GPU-beschleunigte CSS-Transforms anwenden
     countriesGroup.style.transform = `translate(${panX}px, ${panY}px) scale(${currentZoom})`;
     document.getElementById('graticule').style.transform = `translate(${panX}px, ${panY}px) scale(${currentZoom})`;
+    
+    // NEU: Schriften bei jedem Zoom-Schritt gegen-skalieren
+    updateLabelsState(currentZoom);
+
     frameRequested = false;
   }
 
@@ -1020,9 +1039,74 @@
     }
   });
 
+  // ── Coverage Labels ──
+  const coveredCountries = [
+    "AL", "AD", "AR", "AU", "AT", "BD", "BE", "BT", "BO", "BW", "BR", "BG", "KH", "CA", "CL", 
+    "CO", "CR", "HR", "CZ", "DK", "DO", "EC", "EE", "SZ", "FI", "FR", "DE", "GH", "GR", "GT", 
+    "HU", "IS", "IN", "ID", "IE", "IL", "IT", "JP", "JO", "KE", "KG", "LA", "LV", "LS", "LT", 
+    "LU", "MK", "MG", "MY", "MT", "MX", "MN", "ME", "NL", "NZ", "NG", "NO", "PA", "PE", "PH", 
+    "PL", "PT", "PR", "RO", "RW", "SN", "RS", "SG", "SK", "SI", "ZA", "KR", "ES", "LK", "SE", 
+    "CH", "TW", "TH", "TR", "UG", "UA", "AE", "GB", "US", "UY"
+  ];
+
+  function buildCoverageLabels() {
+    // Eigene Gruppe innerhalb der countriesGroup erstellen (wird automatisch mitgezoomt)
+    const labelsGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    labelsGroup.setAttribute('id', 'coverage-labels');
+    countriesGroup.appendChild(labelsGroup);
+
+    coveredCountries.forEach(iso => {
+      const path = document.getElementById(iso.toLowerCase()) || document.getElementById(iso.toUpperCase());
+      if (path) {
+        // Land optisch hervorheben
+        path.classList.add('has-coverage');
+
+        // Geometrischen Mittelpunkt des Pfades finden
+        const bbox = path.getBBox();
+        const centerX = bbox.x + bbox.width / 2;
+        const centerY = bbox.y + bbox.height / 2;
+
+        // SVG Text-Element erstellen
+        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        text.setAttribute('x', centerX);
+        text.setAttribute('y', centerY);
+        text.setAttribute('class', 'country-label');
+        text.dataset.iso = iso.toUpperCase();
+        
+        // Vollen Namen aus COUNTRIES laden (falls vorhanden)
+        const info = (typeof COUNTRIES !== 'undefined') ? COUNTRIES[iso.toUpperCase()] || COUNTRIES[iso.toLowerCase()] : null;
+        text.dataset.name = info ? (info.name || iso) : iso;
+
+        text.textContent = text.dataset.iso;
+        labelsGroup.appendChild(text);
+      }
+    });
+
+    // Direkt einmal initial anpassen
+    updateLabelsState(currentZoom);
+  }
+
+  function updateLabelsState(zoom) {
+    const labels = document.querySelectorAll('.country-label');
+    const zoomThreshold = 3.5; // Ab diesem Zoomlevel wird der ganze Name gezeigt
+
+    labels.forEach(label => {
+      if (zoom >= zoomThreshold) {
+        label.textContent = label.dataset.name;
+        // Schriftgröße gegen-skalieren (da die ganze SVG-Gruppe gezoomt wird)
+        label.style.fontSize = (10 / zoom) + 'px';
+      } else {
+        label.textContent = label.dataset.iso;
+        // Etwas größerer Basis-Wert für die Kürzel
+        label.style.fontSize = (18 / zoom) + 'px';
+      }
+    });
+  }
+
   // ── Init ──
   buildGraticule();
   buildMap();
+  buildCoverageLabels();
 })();
 </script>
 

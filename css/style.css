@@ -176,6 +176,10 @@ header > * { pointer-events: auto; }
   dominant-baseline: central;
   text-shadow: 0 2px 6px rgba(0,0,0,0.9);
   transition: opacity 0.2s ease;
+  
+  /* NEU: Verhindert das Markieren des Textes beim Zoomen/Ziehen */
+  user-select: none;
+  -webkit-user-select: none; 
 }
 
 /* Driving side colors */

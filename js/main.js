@@ -69,7 +69,7 @@
     "PL", "PT", "PR", "RO", "RW", "SN", "RS", "SG", "SK", "SI", "ZA", "KR", "ES", "LK", "SE", 
     "CH", "TW", "TH", "TR", "UG", "UA", "AE", "GB", "US", "UY",
     // Neue (vorher fehlende) Länder:
-    "BA", "XK", "MD", "VN", "RU", "KZ", "NP", "OM", "QA", "PS", "PY"
+    "BA", "XK", "MD", "VN", "RU", "KZ", "NP", "OM", "QA", "PS", "PY", "LB"
   ];
 
   // Algorithmus zur Findung des Festland-Zentrums

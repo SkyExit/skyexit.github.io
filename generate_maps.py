@@ -21,10 +21,13 @@ Verwendung:
     python generate_maps.py ne_50m_admin_0_countries.geojson ne_10m_admin_0_countries.geojson
 
 Ausgabe (im Ordner data/):
-    map-paths-lod0.js  – Zoom 1–3  (grob,   für schnelle Übersicht)
-    map-paths-lod1.js  – Zoom 3–6  (mittel, Standard)
-    map-paths-lod2.js  – Zoom 6+   (fein,   lazy geladen)
+    map-paths-lod0.js  – Zoom 1.0–2.5  (Übersicht,    ~17 km  Toleranz)
+    map-paths-lod1.js  – Zoom 2.5–5.0  (Regional,     ~ 3 km  Toleranz)
+    map-paths-lod2.js  – Zoom 5.0–8.0  (Länder,       ~780 m  Toleranz, lazy)
+    map-paths-lod3.js  – Zoom 8.0+     (Detail,       ~220 m  Toleranz, lazy, 10m-Quelle empfohlen)
     map-bounds.js      – Bounding-Boxes für Viewport-Culling
+
+Qualitäts-Tipp: Für LOD2 und LOD3 die 10m-Datei als zweites Argument übergeben.
 """
 
 import json, math, sys
@@ -117,10 +120,12 @@ def geom_bbox(geom):
 
 # ── LOD-Konfiguration ──────────────────────────────────────────────────────────
 # (Suffix, Toleranz in Grad, SVG-Dezimalstellen)
+# Toleranz × 111 km ≈ Mindestdetail  (1° ≈ 111 km am Äquator)
 LOD = [
-    ('lod0', 0.50, 1),   # Zoom 1–3:  grob   (~55 km)
-    ('lod1', 0.10, 1),   # Zoom 3–6:  mittel (~11 km)
-    ('lod2', 0.02, 1),   # Zoom 6+:   fein   (~ 2 km)
+    ('lod0', 0.15,  1),   # Zoom 1.0–2.5:  Übersicht  (~17 km)
+    ('lod1', 0.03,  1),   # Zoom 2.5–5.0:  Regional   (~ 3 km)
+    ('lod2', 0.007, 2),   # Zoom 5.0–8.0:  Länder     (~780 m)  – 10m-Quelle empfohlen
+    ('lod3', 0.002, 2),   # Zoom 8.0+:     Detail     (~220 m)  – 10m-Quelle nötig
 ]
 
 # ISO-Spalten, in Reihenfolge der Präferenz
@@ -161,8 +166,8 @@ def main(args):
     bounds = {}
 
     for i, (suffix, tol, prec) in enumerate(LOD):
-        # LOD2 aus der hochauflösenden Datei generieren (falls angegeben)
-        gdf = gdf_fine if (i == 2 and len(args) > 1) else gdf_coarse
+        # LOD2 + LOD3 aus der hochauflösenden Datei generieren (falls angegeben)
+        gdf = gdf_fine if (i >= 2 and len(args) > 1) else gdf_coarse
 
         print(f"\nGeneriere {suffix}  (Toleranz {tol}°, Quelle: {Path(gdf.attrs.get('_path', args[0])).name if hasattr(gdf, 'attrs') else '?'})…")
         paths = {}
@@ -185,8 +190,8 @@ def main(args):
             if d:
                 paths[iso] = d
 
-            # Bounding Boxes einmalig aus LOD1 berechnen
-            if suffix == 'lod1' and iso not in bounds:
+            # Bounding Boxes einmalig aus LOD0 berechnen (immer verfügbar)
+            if suffix == 'lod0' and iso not in bounds:
                 b = geom_bbox(geom)
                 if b:
                     bounds[iso] = b

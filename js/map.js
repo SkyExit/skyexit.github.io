@@ -3,16 +3,19 @@
 // ── LOD-Konfiguration ──────────────────────────────────────────────────────────
 // Jede Stufe ist unterhalb des angegebenen Zoom-Werts aktiv.
 const LOD_CONFIG = [
-  { maxZoom: 3.0,      varName: 'MAP_PATHS_LOD0' },
-  { maxZoom: 6.0,      varName: 'MAP_PATHS_LOD1' },
-  { maxZoom: Infinity, varName: 'MAP_PATHS_LOD2' },
+  { maxZoom: 2.5,      varName: 'MAP_PATHS_LOD0' },  // Übersicht  (~17 km)
+  { maxZoom: 5.0,      varName: 'MAP_PATHS_LOD1' },  // Regional   (~ 3 km)
+  { maxZoom: 8.0,      varName: 'MAP_PATHS_LOD2' },  // Länder     (~780 m)
+  { maxZoom: Infinity, varName: 'MAP_PATHS_LOD3' },  // Detail     (~220 m)
 ];
 
-// Zoom-Schwelle, ab der LOD2 im Hintergrund vorgeladen wird
-const LOD2_PRELOAD_ZOOM = 4.5;
+// Ab diesen Schwellen werden die höheren LOD-Stufen im Hintergrund vorgeladen
+const LOD2_PRELOAD_ZOOM = 3.5;
+const LOD3_PRELOAD_ZOOM = 6.5;
 
 let _activeLod   = -1;
 let _lod2Loading = false;
+let _lod3Loading = false;
 
 function _getLodIndex(zoom) {
   for (let i = 0; i < LOD_CONFIG.length; i++) {
@@ -96,23 +99,31 @@ function buildMap() {
 }
 
 // ── LOD-Umschalten ────────────────────────────────────────────────────────────
+function _lazyLoad(src, lodIndex) {
+  const s = document.createElement('script');
+  s.src = src;
+  s.onload = () => {
+    if (_getLodIndex(GeoApp.currentZoom) === lodIndex) _applyLod(lodIndex);
+  };
+  document.head.appendChild(s);
+}
+
 function updateLod(zoom) {
-  // LOD2 vorsorglich laden, sobald der Nutzer nah genug heranzoomt
+  // Höhere LOD-Stufen vorsorglich im Hintergrund laden
   if (zoom >= LOD2_PRELOAD_ZOOM && !_lod2Loading) {
     _lod2Loading = true;
-    const s = document.createElement('script');
-    s.src = 'data/map-paths-lod2.js';
-    s.onload = () => {
-      if (_getLodIndex(GeoApp.currentZoom) === 2) _applyLod(2);
-    };
-    document.head.appendChild(s);
+    _lazyLoad('data/map-paths-lod2.js', 2);
+  }
+  if (zoom >= LOD3_PRELOAD_ZOOM && !_lod3Loading) {
+    _lod3Loading = true;
+    _lazyLoad('data/map-paths-lod3.js', 3);
   }
 
   const target = _getLodIndex(zoom);
   if (target === _activeLod) return;
 
   const data = _getLodData(target);
-  if (!data) return;   // Noch nicht geladen (LOD2 lädt ggf. noch)
+  if (!data) return;   // Noch nicht geladen — wird per onload nachgeholt
 
   _applyLod(target);
 }

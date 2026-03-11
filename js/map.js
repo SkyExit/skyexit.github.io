@@ -73,13 +73,20 @@ function buildGraticule() {
 
 // ── Karte aufbauen ────────────────────────────────────────────────────────────
 function buildMap() {
-  const mapData = _getStartData();
+  // Bug-Fix: _activeLod korrekt auf die tatsächlich geladene Stufe setzen
+  let mapData = null;
+  for (let i = 0; i < LOD_CONFIG.length; i++) {
+    mapData = _getLodData(i);
+    if (mapData) { _activeLod = i; break; }
+  }
+  if (!mapData && typeof MAP_PATHS !== 'undefined') {
+    mapData = MAP_PATHS;
+    _activeLod = -1; // Fallback-Daten, kein automatisches LOD-Switching
+  }
   if (!mapData) {
     console.error('Keine Kartendaten gefunden. Führe generate_maps.py aus oder stelle map-paths.js bereit.');
     return;
   }
-
-  _activeLod = 0;
 
   for (const [iso, pathD] of Object.entries(mapData)) {
     const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
@@ -103,7 +110,12 @@ function _lazyLoad(src, lodIndex) {
   const s = document.createElement('script');
   s.src = src;
   s.onload = () => {
-    if (_getLodIndex(GeoApp.currentZoom) === lodIndex) _applyLod(lodIndex);
+    // Nach dem Laden sofort anwenden, falls diese Stufe jetzt gebraucht wird
+    updateLod(GeoApp.currentZoom);
+  };
+  s.onerror = () => {
+    // Datei nicht gefunden → zukünftige Versuche sollen auf das nächstbeste LOD fallen
+    console.info(`LOD${lodIndex} (${src}) nicht gefunden – bleibe bei bestem verfügbaren LOD`);
   };
   document.head.appendChild(s);
 }
@@ -122,10 +134,11 @@ function updateLod(zoom) {
   const target = _getLodIndex(zoom);
   if (target === _activeLod) return;
 
-  const data = _getLodData(target);
-  if (!data) return;   // Noch nicht geladen — wird per onload nachgeholt
-
-  _applyLod(target);
+  // Bug-Fix: nicht still scheitern — nächstbeste verfügbare Stufe verwenden
+  for (let i = target; i >= 0; i--) {
+    const data = _getLodData(i);
+    if (data) { _applyLod(i); return; }
+  }
 }
 
 function _applyLod(index) {

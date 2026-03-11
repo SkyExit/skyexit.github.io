@@ -26,8 +26,15 @@ function _getLodIndex(zoom) {
 }
 
 function _getLodData(index) {
-  const name = LOD_CONFIG[index]?.varName;
-  return name && typeof window[name] !== 'undefined' ? window[name] : null;
+  // window[name] funktioniert nur für var-Deklarationen, nicht für const/let.
+  // Daher direkter Zugriff per Variablenname.
+  switch (LOD_CONFIG[index]?.varName) {
+    case 'MAP_PATHS_LOD0': return typeof MAP_PATHS_LOD0 !== 'undefined' ? MAP_PATHS_LOD0 : null;
+    case 'MAP_PATHS_LOD1': return typeof MAP_PATHS_LOD1 !== 'undefined' ? MAP_PATHS_LOD1 : null;
+    case 'MAP_PATHS_LOD2': return typeof MAP_PATHS_LOD2 !== 'undefined' ? MAP_PATHS_LOD2 : null;
+    case 'MAP_PATHS_LOD3': return typeof MAP_PATHS_LOD3 !== 'undefined' ? MAP_PATHS_LOD3 : null;
+    default: return null;
+  }
 }
 
 // Startreihenfolge: LOD0 → LOD1 → Original MAP_PATHS (Fallback)

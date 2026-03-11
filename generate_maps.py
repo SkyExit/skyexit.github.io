@@ -103,13 +103,14 @@ def geom_to_svg(geom, prec=1):
 
 
 def geom_bbox(geom):
-    """Bounding Box einer Geometrie in SVG-Koordinaten."""
-    xs, ys = [], []
+    """Bounding Box des größten Teilpolygons in SVG-Koordinaten.
+    Nur das flächengrößte Polygon wird verwendet, damit Länder mit
+    Übersee-Territorien (z. B. FR: Festland + Guadeloupe + Réunion)
+    keine riesigen Bboxen bekommen, die das Viewport-Culling verfälschen."""
     polys = list(geom.geoms) if geom.geom_type == 'MultiPolygon' else [geom]
-    for poly in polys:
-        for lon, lat in list(poly.exterior.coords):
-            x, y = project(lon, lat)
-            xs.append(x); ys.append(y)
+    main = max(polys, key=lambda p: p.area)
+    xs = [project(lon, lat)[0] for lon, lat in list(main.exterior.coords)]
+    ys = [project(lon, lat)[1] for lon, lat in list(main.exterior.coords)]
     if not xs:
         return None
     return {

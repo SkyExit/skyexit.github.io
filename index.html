@@ -9,17 +9,6 @@
 </head>
 <body>
 
-  <script src="data/map-paths.js" onerror="void 0"></script>
-  <script src="data/countries.js"></script>
-
-  <!-- LOD-Karten (generiert durch generate_maps.py – Fallback auf map-paths.js wenn nicht vorhanden) -->
-  <!-- LOD2 + LOD3: statisch geladen (file://-kompatibel); via HTTP-Server werden sie zusätzlich lazy nachgeladen -->
-  <script src="data/map-paths-lod0.js" onerror="void 0"></script>
-  <script src="data/map-paths-lod1.js" onerror="void 0"></script>
-  <script src="data/map-paths-lod2.js" onerror="void 0"></script>
-  <script src="data/map-paths-lod3.js" onerror="void 0"></script>
-  <script src="data/map-bounds.js"     onerror="void 0"></script>
-
   <header>
     <div class="logo">
       <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="1.5"/><ellipse cx="12" cy="12" rx="4" ry="10" fill="none" stroke="currentColor" stroke-width="1"/><line x1="2" y1="12" x2="22" y2="12" stroke="currentColor" stroke-width="0.8"/><line x1="4" y1="7" x2="20" y2="7" stroke="currentColor" stroke-width="0.5"/><line x1="4" y1="17" x2="20" y2="17" stroke="currentColor" stroke-width="0.5"/></svg>
@@ -79,6 +68,15 @@
     <button class="zoom-btn" onclick="zoomMap(0.77)" title="Verkleinern">&minus;</button>
     <button class="zoom-btn" onclick="resetZoom()" title="Zurücksetzen" style="font-size:14px">⟲</button>
   </div>
+
+  <!-- Kartendaten: LOD0+1 synchron (klein, sofort nötig); LOD2+3 async (groß, lädt im Hintergrund) -->
+  <script src="data/map-paths.js"      onerror="void 0"></script>
+  <script src="data/countries.js"></script>
+  <script src="data/map-paths-lod0.js" onerror="void 0"></script>
+  <script src="data/map-paths-lod1.js" onerror="void 0"></script>
+  <script src="data/map-bounds.js"     onerror="void 0"></script>
+  <script src="data/map-paths-lod2.js" onerror="void 0" async></script>
+  <script src="data/map-paths-lod3.js" onerror="void 0" async></script>
 
   <script src="js/state.js"></script>
   <script src="js/projection.js"></script>

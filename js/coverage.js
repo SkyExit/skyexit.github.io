@@ -12,6 +12,19 @@ const coveredCountries = [
   "BA", "XK", "MD", "VN", "RU", "KZ", "NP", "OM", "QA", "PS", "PY", "LB"
 ];
 
+// Berechnet Bounding-Box aus einem SVG-Pfad-String ohne DOM-Zugriff (kein getBBox).
+function _pathBbox(d) {
+  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+  const re = /[ML]([\d.]+),([\d.]+)/g;
+  let m;
+  while ((m = re.exec(d)) !== null) {
+    const x = parseFloat(m[1]), y = parseFloat(m[2]);
+    if (x < minX) minX = x; if (x > maxX) maxX = x;
+    if (y < minY) minY = y; if (y > maxY) maxY = y;
+  }
+  return { x: minX, y: minY, width: maxX - minX, height: maxY - minY };
+}
+
 // Algorithmus zur Findung des Festland-Zentrums
 function getCountryCenter(path, iso) {
   // Manuelle Offsets für Länder mit ungünstigem geometrischen Schwerpunkt (SVG-Koordinaten)
@@ -24,44 +37,24 @@ function getCountryCenter(path, iso) {
   };
 
   const d = path.getAttribute('d');
-  // SVG-Pfad an jedem 'M'/'m' in einzelne Polygone (Inseln) aufteilen
   const subpaths = d.match(/[Mm][^Mm]+/g);
 
-  let centerX, centerY;
-
+  let bbox;
   if (!subpaths || subpaths.length === 1) {
-    const bbox = path.getBBox();
-    centerX = bbox.x + bbox.width / 2;
-    centerY = bbox.y + bbox.height / 2;
+    bbox = _pathBbox(d);
   } else {
-    // Inseln: Polygon mit der größten Fläche (= Festland) suchen
-    let maxArea = 0;
-    let bestBBox = null;
-
-    const tempPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    countriesGroup.appendChild(tempPath);
-
-    subpaths.forEach(subD => {
-      tempPath.setAttribute('d', subD);
-      const bbox = tempPath.getBBox();
-      const area = bbox.width * bbox.height;
-      if (area > maxArea) {
-        maxArea = area;
-        bestBBox = bbox;
-      }
-    });
-
-    countriesGroup.removeChild(tempPath);
-
-    centerX = bestBBox.x + bestBBox.width / 2;
-    centerY = bestBBox.y + bestBBox.height / 2;
+    // Subpfad mit der größten Bounding-Box-Fläche (≈ Festland) wählen
+    let bestArea = -1;
+    for (const sub of subpaths) {
+      const b = _pathBbox(sub);
+      const area = b.width * b.height;
+      if (area > bestArea) { bestArea = area; bbox = b; }
+    }
   }
 
-  if (offsets[iso]) {
-    centerX += offsets[iso].dx;
-    centerY += offsets[iso].dy;
-  }
-
+  let centerX = bbox.x + bbox.width  / 2;
+  let centerY = bbox.y + bbox.height / 2;
+  if (offsets[iso]) { centerX += offsets[iso].dx; centerY += offsets[iso].dy; }
   return { x: centerX, y: centerY };
 }
 

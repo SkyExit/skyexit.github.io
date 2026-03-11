@@ -9,14 +9,9 @@ const LOD_CONFIG = [
   { maxZoom: Infinity, varName: 'MAP_PATHS_LOD3' },  // Detail     (~220 m)
 ];
 
-// Ab diesen Schwellen werden die höheren LOD-Stufen im Hintergrund vorgeladen
-const LOD2_PRELOAD_ZOOM = 3.5;
-const LOD3_PRELOAD_ZOOM = 6.5;
-
-let _activeLod   = -1;
-// Bereits statisch geladen? Dann kein erneutes Lazy-Loading nötig.
-let _lod2Loading = typeof MAP_PATHS_LOD2 !== 'undefined';
-let _lod3Loading = typeof MAP_PATHS_LOD3 !== 'undefined';
+// LOD2 + LOD3 werden per <script async> in index.html im Hintergrund geladen.
+// Kein dynamisches Nachladen nötig.
+let _activeLod = -1;
 
 function _getLodIndex(zoom) {
   for (let i = 0; i < LOD_CONFIG.length; i++) {
@@ -114,35 +109,10 @@ function buildMap() {
 }
 
 // ── LOD-Umschalten ────────────────────────────────────────────────────────────
-function _lazyLoad(src, lodIndex) {
-  const s = document.createElement('script');
-  s.src = src;
-  s.onload = () => {
-    // Nach dem Laden sofort anwenden, falls diese Stufe jetzt gebraucht wird
-    updateLod(GeoApp.currentZoom);
-  };
-  s.onerror = () => {
-    // Datei nicht gefunden → zukünftige Versuche sollen auf das nächstbeste LOD fallen
-    console.info(`LOD${lodIndex} (${src}) nicht gefunden – bleibe bei bestem verfügbaren LOD`);
-  };
-  document.head.appendChild(s);
-}
-
 function updateLod(zoom) {
-  // Höhere LOD-Stufen vorsorglich im Hintergrund laden
-  if (zoom >= LOD2_PRELOAD_ZOOM && !_lod2Loading) {
-    _lod2Loading = true;
-    _lazyLoad('data/map-paths-lod2.js', 2);
-  }
-  if (zoom >= LOD3_PRELOAD_ZOOM && !_lod3Loading) {
-    _lod3Loading = true;
-    _lazyLoad('data/map-paths-lod3.js', 3);
-  }
-
   const target = _getLodIndex(zoom);
   if (target === _activeLod) return;
-
-  // Bug-Fix: nicht still scheitern — nächstbeste verfügbare Stufe verwenden
+  // Nächstbeste verfügbare Stufe verwenden (LOD2/3 laden ggf. noch asynchron)
   for (let i = target; i >= 0; i--) {
     const data = _getLodData(i);
     if (data) { _applyLod(i); return; }
@@ -170,8 +140,10 @@ function scheduleViewportCulling() {
 function updateViewportCulling() {
   if (typeof MAP_BOUNDS === 'undefined') return;
 
-  // Bei vollständiger Übersicht alle Länder einblenden — kein Culling nötig
-  if (GeoApp.currentZoom < 1.8) {
+  // Bei vollständiger Übersicht alle Länder einblenden — kein Culling nötig.
+  // Schwelle bei 3.0: darunter ist die Welt fast vollständig sichtbar und
+  // Länder mit Übersee-Territorien (z.B. FR) haben riesige Bounding-Boxes.
+  if (GeoApp.currentZoom < 3.0) {
     document.querySelectorAll('.country').forEach(el => { el.style.display = ''; });
     return;
   }

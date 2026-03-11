@@ -15,6 +15,8 @@ function updateTransform() {
   document.getElementById('graticule').style.transform = `translate(${GeoApp.panX}px, ${GeoApp.panY}px) scale(${GeoApp.currentZoom})`;
 
   updateLabelsState(GeoApp.currentZoom);
+  updateLod(GeoApp.currentZoom);
+  scheduleViewportCulling();
 }
 
 window.zoomMap = function(factor) {

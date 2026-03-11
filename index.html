@@ -12,6 +12,11 @@
   <script src="data/map-paths.js"></script>
   <script src="data/countries.js"></script>
 
+  <!-- LOD-Karten (generiert durch generate_maps.py – Fallback auf map-paths.js wenn nicht vorhanden) -->
+  <script src="data/map-paths-lod0.js" onerror="console.info('LOD0 fehlt – führe generate_maps.py aus')"></script>
+  <script src="data/map-paths-lod1.js" onerror="console.info('LOD1 fehlt – führe generate_maps.py aus')"></script>
+  <script src="data/map-bounds.js"      onerror="console.info('map-bounds.js fehlt – Viewport-Culling deaktiviert')"></script>
+
   <header>
     <div class="logo">
       <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="1.5"/><ellipse cx="12" cy="12" rx="4" ry="10" fill="none" stroke="currentColor" stroke-width="1"/><line x1="2" y1="12" x2="22" y2="12" stroke="currentColor" stroke-width="0.8"/><line x1="4" y1="7" x2="20" y2="7" stroke="currentColor" stroke-width="0.5"/><line x1="4" y1="17" x2="20" y2="17" stroke="currentColor" stroke-width="0.5"/></svg>
@@ -73,6 +78,7 @@
   </div>
 
   <script src="js/state.js"></script>
+  <script src="js/projection.js"></script>
   <script src="js/map.js"></script>
   <script src="js/coverage.js"></script>
   <script src="js/tooltip.js"></script>

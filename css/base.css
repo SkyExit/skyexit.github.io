@@ -1,0 +1,33 @@
+:root {
+  --bg-deep: #0a0e14;
+  --bg-card: #121820;
+  --bg-card-hover: #1a2230;
+  --ocean: #0d1520;
+  --land: #2a3444;
+  --land-hover: #3d5068;
+  --land-stroke: #1a2230;
+  --right-drive: #2a5040;
+  --left-drive: #503a2a;
+  --right-drive-hover: #3a7058;
+  --left-drive-hover: #705a3a;
+  --accent: #e8c47c;
+  --accent-dim: #c4975a;
+  --text: #e0ddd6;
+  --text-dim: #8a8880;
+  --text-muted: #5a5850;
+  --border: #2a2e34;
+  --shadow: rgba(0,0,0,0.5);
+  --glass: rgba(18,24,32,0.92);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Instrument Sans', sans-serif;
+  background: var(--bg-deep);
+  color: var(--text);
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+  cursor: default;
+}

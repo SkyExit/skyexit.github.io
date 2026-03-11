@@ -14,8 +14,9 @@ const LOD2_PRELOAD_ZOOM = 3.5;
 const LOD3_PRELOAD_ZOOM = 6.5;
 
 let _activeLod   = -1;
-let _lod2Loading = false;
-let _lod3Loading = false;
+// Bereits statisch geladen? Dann kein erneutes Lazy-Loading nötig.
+let _lod2Loading = typeof MAP_PATHS_LOD2 !== 'undefined';
+let _lod3Loading = typeof MAP_PATHS_LOD3 !== 'undefined';
 
 function _getLodIndex(zoom) {
   for (let i = 0; i < LOD_CONFIG.length; i++) {

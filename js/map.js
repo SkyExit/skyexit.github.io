@@ -143,7 +143,7 @@ let _cullingTimer = null;
 
 function scheduleViewportCulling() {
   clearTimeout(_cullingTimer);
-  _cullingTimer = setTimeout(updateViewportCulling, 80);
+  _cullingTimer = setTimeout(updateViewportCulling, 150);
 }
 
 function updateViewportCulling() {
@@ -159,8 +159,9 @@ function updateViewportCulling() {
   const px = GeoApp.panX;
   const py = GeoApp.panY;
 
-  // 5 % Puffer an allen Seiten verhindert Flackern beim Scrollen
-  const vL = -100, vR = 2100, vT = -100, vB = 1100;
+  // Puffer in SVG-ViewBox-Einheiten (0–2000 × 0–1000).
+  // 400 H / 200 V entspricht ~20 % der Bildschirmbreite/-höhe — unabhängig vom Zoom.
+  const vL = -400, vR = 2400, vT = -200, vB = 1200;
 
   for (const [iso, b] of Object.entries(MAP_BOUNDS)) {
     const el = document.getElementById(iso);

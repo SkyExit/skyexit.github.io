@@ -1,92 +1,16 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="de">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Weltkarte — Länderinformationen</title>
-  
-  <link rel="stylesheet" href="css/style.css">
-</head>
-<body>
-
-  <header>
-    <div class="logo">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="1.5"/><ellipse cx="12" cy="12" rx="4" ry="10" fill="none" stroke="currentColor" stroke-width="1"/><line x1="2" y1="12" x2="22" y2="12" stroke="currentColor" stroke-width="0.8"/><line x1="4" y1="7" x2="20" y2="7" stroke="currentColor" stroke-width="0.5"/><line x1="4" y1="17" x2="20" y2="17" stroke="currentColor" stroke-width="0.5"/></svg>
-      Weltkarte
-    </div>
-    <div class="controls">
-      <div class="legend" id="legend">
-        <div class="legend-item"><div class="legend-dot right"></div>Rechtsverkehr</div>
-        <div class="legend-item"><div class="legend-dot left"></div>Linksverkehr</div>
-      </div>
-      <div class="toggle-wrap" id="driving-toggle" onclick="toggleDriving()">
-        <span class="hide-mobile">Verkehrsseite</span>
-        <div class="toggle-track"><div class="toggle-thumb"></div></div>
-      </div>
-      <div class="search-wrap">
-        <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
-        <input type="text" class="search-input" id="search-input" placeholder="Land suchen…" autocomplete="off">
-        <div class="search-results" id="search-results"></div>
-      </div>
-    </div>
-  </header>
-
-  <div id="map-container">
-    <svg id="world-map" viewBox="0 0 2000 1000" preserveAspectRatio="xMidYMid meet">
-      <g class="graticule" id="graticule"></g>
-      <g id="countries-group"></g>
-    </svg>
-  </div>
-
-  <div id="tooltip">
-    <div class="tooltip-flag" id="tooltip-flag"></div>
-    <div class="tooltip-info">
-      <div class="tooltip-name" id="tooltip-name"></div>
-      <div class="tooltip-tld" id="tooltip-tld"></div>
-      <div class="tooltip-driving" id="tooltip-driving"></div>
-    </div>
-  </div>
-
-  <div id="overlay" onclick="closePanel(event)">
-    <div id="info-panel">
-      <div class="panel-header">
-        <div class="panel-title-area">
-          <div class="panel-flag" id="panel-flag"></div>
-          <div>
-            <div class="panel-title" id="panel-title"></div>
-            <div class="panel-subtitle" id="panel-subtitle"></div>
-          </div>
-        </div>
-        <button class="close-btn" onclick="closePanel(event, true)">&times;</button>
-      </div>
-      <div class="panel-body" id="panel-body"></div>
-    </div>
-  </div>
-
-  <div class="zoom-controls">
-    <button class="zoom-btn" onclick="zoomMap(1.3)" title="Vergrößern">+</button>
-    <button class="zoom-btn" onclick="zoomMap(0.77)" title="Verkleinern">&minus;</button>
-    <button class="zoom-btn" onclick="resetZoom()" title="Zurücksetzen" style="font-size:14px">⟲</button>
-  </div>
-
-  <!-- Kartendaten: LOD0+1 synchron (klein, sofort nötig); LOD2+3 async (groß, lädt im Hintergrund) -->
-  <script src="data/map-paths.js"      onerror="void 0"></script>
-  <script src="data/countries.js"></script>
-  <script src="data/map-paths-lod0.js" onerror="void 0"></script>
-  <script src="data/map-paths-lod1.js" onerror="void 0"></script>
-  <script src="data/map-bounds.js"     onerror="void 0"></script>
-  <script src="data/map-paths-lod2.js" onerror="void 0" async></script>
-  <script src="data/map-paths-lod3.js" onerror="void 0" async></script>
-
-  <script src="js/state.js"></script>
-  <script src="js/projection.js"></script>
-  <script src="js/map.js"></script>
-  <script src="js/coverage.js"></script>
-  <script src="js/tooltip.js"></script>
-  <script src="js/panel.js"></script>
-  <script src="js/controls.js"></script>
-  <script src="js/zoom-pan.js"></script>
-  <script src="js/search.js"></script>
-  <script src="js/main.js"></script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="GeoCheatMK2 ist eine schnelle interaktive Weltkarte mit GeoGuessr-relevanten Länderinformationen."
+    />
+    <title>GeoCheatMK2</title>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
 </html>

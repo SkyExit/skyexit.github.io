@@ -1,0 +1,27 @@
+{
+  "name": "geocheatmk2",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "predev": "npm run prepare:data",
+    "dev": "vite --host 0.0.0.0",
+    "prebuild": "npm run prepare:data",
+    "build": "vite build",
+    "typecheck": "tsc --noEmit",
+    "prepare:data": "node scripts/build-data.mjs",
+    "validate:data": "node scripts/build-data.mjs --validate-only",
+    "test:smoke": "playwright test"
+  },
+  "dependencies": {
+    "lucide": "^0.561.0",
+    "maplibre-gl": "^5.24.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.57.0",
+    "@types/geojson": "^7946.0.16",
+    "@types/node": "^25.9.1",
+    "typescript": "^6.0.3",
+    "vite": "^8.0.14"
+  }
+}

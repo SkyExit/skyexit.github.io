@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="SkyExit Pages – eine zentrale Übersicht meiner unabhängigen Web-Projekte."
+    />
+    <meta name="theme-color" content="#080b10" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="de_DE" />
+    <meta property="og:title" content="SkyExit Pages" />
+    <meta
+      property="og:description"
+      content="Eine zentrale Übersicht meiner unabhängigen Web-Projekte."
+    />
+    <meta property="og:url" content="https://skyexit.github.io/" />
+    <meta property="og:image" content="https://skyexit.github.io/og.png" />
+    <meta property="og:image:width" content="1536" />
+    <meta property="og:image:height" content="1024" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="SkyExit Pages" />
+    <meta
+      name="twitter:description"
+      content="Eine zentrale Übersicht meiner unabhängigen Web-Projekte."
+    />
+    <meta name="twitter:image" content="https://skyexit.github.io/og.png" />
+    <link rel="canonical" href="https://skyexit.github.io/" />
+    <link rel="stylesheet" href="styles.css" />
+    <title>SkyExit Pages</title>
+  </head>
+  <body>
+    <a class="skip-link" href="#projects">Direkt zu den Projekten</a>
+
+    <div class="ambient ambient-one" aria-hidden="true"></div>
+    <div class="ambient ambient-two" aria-hidden="true"></div>
+
+    <header class="site-header shell">
+      <a class="brand" href="/" aria-label="SkyExit Pages – Startseite">
+        <span class="brand-mark" aria-hidden="true">S</span>
+        <span>SkyExit</span>
+      </a>
+      <a
+        class="github-link"
+        href="https://github.com/SkyExit"
+        target="_blank"
+        rel="noreferrer"
+      >
+        GitHub-Profil
+        <span aria-hidden="true">↗</span>
+      </a>
+    </header>
+
+    <main>
+      <section class="hero shell" aria-labelledby="hero-title">
+        <p class="eyebrow"><span></span> Independent web projects</p>
+        <h1 id="hero-title">Ein Ausgangspunkt.<br /><em>Viele Ideen.</em></h1>
+        <p class="hero-copy">
+          Willkommen bei SkyExit Pages. Hier findest du meine Web-Projekte –
+          jedes unabhängig entwickelt, versioniert und veröffentlicht.
+        </p>
+        <a class="hero-action" href="#projects">
+          Projekte entdecken
+          <span aria-hidden="true">↓</span>
+        </a>
+      </section>
+
+      <section class="projects-section shell" id="projects" aria-labelledby="projects-title">
+        <div class="section-heading">
+          <div>
+            <p class="section-kicker">Ausgewählte Projekte</p>
+            <h2 id="projects-title">Direkt loslegen</h2>
+          </div>
+          <p class="project-count" id="project-count" aria-live="polite">Projekte werden geladen</p>
+        </div>
+
+        <div class="projects-grid" id="projects-grid" aria-live="polite"></div>
+        <p class="load-error" id="load-error" role="alert" hidden>
+          Die Projektübersicht konnte nicht geladen werden.
+          <a href="https://github.com/SkyExit">Projekte auf GitHub ansehen</a>.
+        </p>
+
+        <noscript>
+          <article class="project-card">
+            <p class="card-number">01</p>
+            <h3>GeoCheat MK2</h3>
+            <p>
+              Interaktive Länderinformationen und Kartenwissen für GeoGuessr –
+              von Verkehrsseiten bis zu regionalen Besonderheiten.
+            </p>
+            <p><a href="https://skyexit.github.io/GeoCheat/">GeoCheat öffnen</a></p>
+          </article>
+        </noscript>
+      </section>
+    </main>
+
+    <footer class="site-footer shell">
+      <p>Gebaut als schlanker Wegweiser – jedes Projekt bleibt eigenständig.</p>
+      <p>© <span id="year">2026</span> SkyExit</p>
+    </footer>
+
+    <script src="projects.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

@@ -1,5 +1,13 @@
 window.SKYPAGES_PROJECTS = Object.freeze([
   Object.freeze({
+    slug: 'GradeVision',
+    title: 'GradeVision',
+    description:
+      'Dein Studium im Blick: Noten, Prüfungen, Aufgaben und Kalender – mit verpflichtender Neon-Anmeldung und privatem Datenabgleich.',
+    siteUrl: 'https://skyexit.github.io/GradeVision/',
+    tags: Object.freeze(['Studium', 'Notenplanung', 'Neon-Login']),
+  }),
+  Object.freeze({
     slug: 'GeoCheat',
     title: 'GeoCheat MK2',
     description:

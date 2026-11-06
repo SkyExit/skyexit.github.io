@@ -30,3 +30,12 @@ must work below `/<repository-name>/`.
 Pushes to `main` publish the static files through GitHub Actions. The workflow
 contains no application builds and does not copy source code from linked
 projects.
+
+
+## GradeVision
+
+Unter https://skyexit.github.io/GradeVision/ liegt ausschließlich der gebaute
+Webclient. Die Nutzung erfordert ein eigenes Neon-Konto. Das App-Quellrepository
+bleibt privat; historische Android-Quellen und serverseitige Geheimnisse werden
+nicht hier veröffentlicht. Updates ersetzen nur die beiden geprüften Dateien
+`GradeVision/index.html` und `GradeVision/release.json`.

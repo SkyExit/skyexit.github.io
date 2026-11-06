@@ -32,6 +32,8 @@ jobs:
         run: |
           mkdir _site
           cp index.html 404.html styles.css projects.js app.js og.png .nojekyll robots.txt sitemap.xml _site/
+          mkdir _site/GradeVision
+          cp GradeVision/index.html GradeVision/release.json _site/GradeVision/
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

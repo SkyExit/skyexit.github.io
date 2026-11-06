@@ -60,8 +60,9 @@
     actions.className = 'card-actions';
     actions.append(
       makeAction('Website öffnen', project.siteUrl, 'primary'),
-      makeAction('Repository', project.repoUrl, 'secondary'),
     );
+
+    if (project.repoUrl) actions.append(makeAction('Repository', project.repoUrl, 'secondary'));
 
     card.append(topline, title, description, tags, actions);
     return card;

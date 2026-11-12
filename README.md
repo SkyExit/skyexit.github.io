@@ -39,3 +39,12 @@ Webclient. Die Nutzung erfordert ein eigenes Neon-Konto. Das App-Quellrepository
 bleibt privat; historische Android-Quellen und serverseitige Geheimnisse werden
 nicht hier veröffentlicht. Updates ersetzen nur die beiden geprüften Dateien
 `GradeVision/index.html` und `GradeVision/release.json`.
+
+
+## TODO
+- GradeVision
+- Minigames
+- SkyStats / SurvivalFriend
+- SkyVideoGrabber
+- GymTracker + CalorieTracker
+- SkyNotes

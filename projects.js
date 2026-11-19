@@ -4,7 +4,7 @@ window.SKYPAGES_PROJECTS = Object.freeze([
     title: 'GradeVision',
     description:
       'Dein Studium im Blick: Noten, Prüfungen, Aufgaben und Kalender – mit verpflichtender Neon-Anmeldung und privatem Datenabgleich.',
-    siteUrl: 'https://skyexit.github.io/GradeVision/',
+    siteUrl: 'https://skyexit.github.io/NotensichtApp/',
     tags: Object.freeze(['Studium', 'Notenplanung', 'Neon-Login']),
   }),
   Object.freeze({
